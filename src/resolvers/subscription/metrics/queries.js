@@ -118,7 +118,7 @@ export default function queries(deployment, since, step) {
       {
         name: "heartbeat",
         query: rangeQuery(
-          `sum(airflow_scheduler_heartbeat{deployment=~"${deployment}"})`
+          `rate(airflow_scheduler_heartbeat{deployment=~"${deployment}", type="counter"}${duration})*60`
         )
       },
       {
