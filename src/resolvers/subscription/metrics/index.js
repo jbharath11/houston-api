@@ -18,8 +18,6 @@ export function buildURI(query) {
 
 // Start the subscription to poll PromQL metrics
 export async function subscribe(parent, args, { db, pubsub }) {
-  log.info("Starting metric subscription");
-
   // Get the release name of the current deployment
   let { releaseName } = await db.query.deployment(
     { where: { id: args.deploymentUuid } },
@@ -34,7 +32,6 @@ export async function subscribe(parent, args, { db, pubsub }) {
     async publish => {
       if (useSample) {
         publish({ metrics: [...sampleData] });
-        log.info(`${sampleData.length} sample metrics for sent.`);
       } else {
         const getQueries = queries(releaseName, args.since, args.step);
         const data = [];
@@ -53,7 +50,6 @@ export async function subscribe(parent, args, { db, pubsub }) {
                 uri: buildURI(ql.query)
               };
             });
-            log.info(`Getting ${k} metrics.`);
             data.push(...promises);
           }
         });

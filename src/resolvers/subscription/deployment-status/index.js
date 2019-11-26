@@ -22,14 +22,12 @@ export function buildURI(query) {
 
 // Start the subscription
 export async function subscribe(parent, args, { pubsub }) {
-  log.info("Starting deployment status subscription");
   const { releaseName } = args;
 
   // Return sample data
   if (useSample) {
     return createPoller(publish => {
       publish({ deploymentStatus: { result: samplePromise } });
-      log.info(`Sample deployment status for ${releaseName} sent.`);
     }, pubsub);
   }
 
@@ -43,7 +41,6 @@ export async function subscribe(parent, args, { pubsub }) {
     }).catch(err => log.debug(err));
 
     publish({ deploymentStatus: { result: response } });
-    log.info(`Deployment status for ${releaseName} sent.`);
   }, pubsub);
 }
 
