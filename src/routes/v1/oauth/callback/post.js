@@ -1,9 +1,11 @@
 import fragment from "./fragment";
 import { createUser as _createUser } from "users";
 import { getClient } from "oauth/config";
+import { PublicSignupsDisabledError } from "errors";
 import { orbit } from "utilities";
 import { prisma } from "generated/client";
 import { createAuthJWT, setJWTCookie } from "jwt";
+import config from "config";
 import { first, merge } from "lodash";
 import { URLSearchParams } from "url";
 
@@ -79,12 +81,17 @@ export default async function(req, res, next) {
   }
 
   // If we just created the user, also create and connect the oauth cred.
-  if (!user) {
+  if (!user && config.get("publicSignups") == true) {
     await prisma.createOAuthCredential({
       oauthProvider: state.provider,
       oauthUserId: providerUserId,
       user: { connect: { id: userId } }
     });
+  }
+
+  // If the user does not exist and public signups are disabled, throw an error
+  if (!user && config.get("publicSignups") == false) {
+    throw new PublicSignupsDisabledError();
   }
 
   // Create the JWT.
