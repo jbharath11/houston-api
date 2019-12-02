@@ -1,5 +1,5 @@
 import fragment from "./fragment";
-import { createUser as _createUser } from "users";
+import { createUser as _createUser, isFirst } from "users";
 import { getClient } from "oauth/config";
 import { PublicSignupsDisabledError } from "errors";
 import { orbit } from "utilities";
@@ -17,6 +17,8 @@ import { URLSearchParams } from "url";
 export default async function(req, res, next) {
   // Grab params out of the request body.
   const { state: rawState } = req.body;
+  const firstUser = await isFirst();
+  console.log(firstUser);
 
   // TODO: Hanvle `error` in the response
 
@@ -90,7 +92,7 @@ export default async function(req, res, next) {
   }
 
   // If the user does not exist and public signups are disabled, throw an error
-  if (!user && config.get("publicSignups") == false) {
+  if (!user && config.get("publicSignups") == false && !firstUser) {
     throw new PublicSignupsDisabledError();
   }
 
