@@ -18,7 +18,6 @@ export default async function(req, res, next) {
   // Grab params out of the request body.
   const { state: rawState } = req.body;
   const firstUser = await isFirst();
-  console.log(firstUser);
 
   // TODO: Hanvle `error` in the response
 
@@ -82,6 +81,16 @@ export default async function(req, res, next) {
     });
   }
 
+  // If the user does not exist and public signups are disabled, throw an error
+  if (
+    !user &&
+    config.get("publicSignups") == false &&
+    !firstUser &&
+    !state.inviteToken
+  ) {
+    throw new PublicSignupsDisabledError();
+  }
+
   // If we just created the user, also create and connect the oauth cred.
   if (!user && config.get("publicSignups") == true) {
     await prisma.createOAuthCredential({
@@ -89,11 +98,6 @@ export default async function(req, res, next) {
       oauthUserId: providerUserId,
       user: { connect: { id: userId } }
     });
-  }
-
-  // If the user does not exist and public signups are disabled, throw an error
-  if (!user && config.get("publicSignups") == false && !firstUser) {
-    throw new PublicSignupsDisabledError();
   }
 
   // Create the JWT.
