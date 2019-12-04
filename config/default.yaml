@@ -245,6 +245,7 @@ roles:
       ? system.workspace.suspend
       ? system.workspace.extendTrial
       ? system.airflow.admin
+      ? system.workspace.create
 
   #
   # Workspace Roles
@@ -313,7 +314,6 @@ roles:
   USER:
     name: User
     permissions:
-      ? system.workspace.create
 
 #
 # Airflow Deployment Configurations

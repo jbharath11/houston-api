@@ -3,7 +3,6 @@ import casual from "casual";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import { importSchema } from "graphql-import";
-import { USER_STATUS_ACTIVE } from "constants";
 
 // Import our application schema
 const schema = makeExecutableSchema({
