@@ -6,7 +6,16 @@ set -e
 # into /usr/local/share/ca-certificates. This completes
 # the certificate installation so we can trust the registry.
 echo "Running update-ca-certificates"
-update-ca-certificates
+source /etc/os-release
+if [ `echo $ID` == "rhel" ] 
+then 
+	update-ca-trust
+elif [ `echo $ID` == "alpine" ] 
+then
+	update-ca-certificates
+else 
+	echo "Host type is not alpine or rhel, please update the entrypoint code based on the host type to execute the ca-certificates"
+fi
 
 HOST=$(echo "${PRISMA__ENDPOINT}" | awk -F// '{print $2}' | awk -F: '{print $1}')
 PORT=$(echo "${PRISMA__ENDPOINT}" | awk -F: '{print $3}' | awk -F/ '{print $1}')
